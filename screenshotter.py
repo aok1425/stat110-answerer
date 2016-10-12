@@ -1,5 +1,6 @@
 from wand.image import Image
 from wand.display import display
+from pdfrw import PdfReader, PdfWriter
 
 PADDING = 10
 
@@ -20,30 +21,11 @@ def take_snapshot(input_file, output_file, start_y, end_y):
         # img.make_blob()
 
 def take_snapshot(input_file, page_num, output_file, start_y, end_y):
-    # start_y and end_y don't involve img.height
     with Image(filename=input_file) as img_seq:
         img = Image(img_seq.sequence[page_num])
         img.crop(top=img.height - end_y, bottom=img.height - start_y)
         img.format = 'png'
         img.save(filename=output_file)
-
-# take_snapshot('/home/aok1425/Downloads/test.pdf', '/home/aok1425/Downloads/temp0.png', 513, 566)
-# with Image(filename='/home/aok1425/Downloads/test2.pdf') as img_seq:
-#     img = img_seq.sequence[0]
-#     img.crop()
-
-def take_snapshots(snippets, input_file, path='/home/aok1425/Downloads/'):
-    counter = 1
-
-    for i,_ in enumerate(snippets[:-1]):
-        if snippets[i+1].page == snippets[i].page:
-            print('on snippet {}, temp{}'.format(i, counter))
-            take_snapshot(input_file, snippets[i].page, path + 'temp{}.png'.format(counter), snippets[i+1].start, snippets[i].start)
-            counter += 1
-
-# take_snapshot('/home/aok1425/Downloads/test_big.pdf', 0, '/home/aok1425/Downloads/temp0.png', 137, 353)
-
-from pdfrw import PdfReader, PdfWriter
 
 def take_snapshots(snippets, input_file, temp_filename='tempfile.pdf'):
     correction_factor = sorted([i.page for i in snippets])[0]
@@ -68,5 +50,3 @@ def make_shortened_pdf(snippets, input_file, temp_filename):
         if i in [i.page for i in snippets]:
             y.addpage(p)
     y.write(path + temp_filename)
-
-make_shortened_pdf(s, '/home/aok1425/Downloads/test_big.pdf', 'temp.pdf')

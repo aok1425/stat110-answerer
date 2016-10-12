@@ -61,28 +61,26 @@ def add_page_break_indices(sq):
 
     return sq
 
-FILENAME = '/home/aok1425/Downloads/test_big.pdf'
-CHAPTER = 2
-QUESTION_NUM = 30
-# FILENAME = '/home/aok1425/Downloads/test_big.pdf'
+class AnswerScreenshotter(object):
+    def __init__(self, filename, chapter, question_num):
+        self.filename = filename
+        self.chapter = chapter
+        self.question_num = question_num
 
-init = open_document(FILENAME)
-starting_page = find_question_page_num(FILENAME, chapter=CHAPTER, question=QUESTION_NUM) # 11.4s
-s = make_snippets(init, page_num=starting_page) # 2.2s
+    def run(self):
+        init = open_document(self.filename)
+        starting_page = find_question_page_num(self.filename, chapter=self.chapter, question=self.question_num)  # 11.4s
+        s = make_snippets(init, page_num=starting_page)  # 2.2s
 
-q = make_question_snippets(s, QUESTION_NUM)
-sq = make_sub_snippets(q)
-a = add_page_break_indices(sq)
-take_snapshots(a, FILENAME)
+        q = make_question_snippets(s, self.question_num)
+        sq = make_sub_snippets(q)
+        a = add_page_break_indices(sq)
+        take_snapshots(a, self.filename)
 
-# print(*[i.text for i in q])
-# print(*[i.text for i in s[:20]])
-# print(*[i.text for i in sq])
-# print(*[i.text for i in a])
+if __name__ == '__main__':
+    FILENAME = '/home/aok1425/Downloads/test_big.pdf'
+    CHAPTER = 2
+    QUESTION_NUM = 35
 
-###
-
-# take_snapshot(FILENAME, q_snippets[-1].start, q_snippets[0].start)
-# take_snapshot(FILENAME, '/home/aok1425/Downloads/tempa.png', 576, 704)
-# take_snapshot(FILENAME, sq[1].start, sq[0].start)
-# take_snapshot(FILENAME, q[-1].start, q[0].start)
+    ans = AnswerScreenshotter(FILENAME, CHAPTER, QUESTION_NUM)
+    ans.run()

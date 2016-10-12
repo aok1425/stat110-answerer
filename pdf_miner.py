@@ -23,9 +23,9 @@ def parse_layout(layout, page_i, text_snippets):
     """Function to recursively parse the layout tree."""
     for lt_obj in layout:
         if isinstance(lt_obj, LTTextBox) or isinstance(lt_obj, LTTextLine):
-            print(page_i, int(lt_obj.bbox[3] + 1), int(lt_obj.bbox[1]))
-            print(lt_obj.__class__.__name__)
-            print(lt_obj.get_text())
+            # print(page_i, int(lt_obj.bbox[3] + 1), int(lt_obj.bbox[1]))
+            # print(lt_obj.__class__.__name__)
+            # print(lt_obj.get_text())
 
             text_snippet = TextSnippet(lt_obj.__class__.__name__,
                                        page_i,
@@ -37,6 +37,7 @@ def parse_layout(layout, page_i, text_snippets):
             parse_layout(lt_obj, page_i, text_snippets)  # Recursive
 
 def open_document(filename):
+    """For pdfminer, not for PyPDF2"""
     fp = open(filename, 'rb')
     parser = PDFParser(fp)
     doc = PDFDocument()
@@ -64,8 +65,6 @@ def make_snippets(document, page_num):
 
     return sorted(text_snippets)
 
-##
-
 def find_question_page_num(document, chapter, question):
     chapter_page = find_page_num(document, 'Chapter{}:'.format(chapter))
     return find_page_num(document, '{}.'.format(question), starting_page=chapter_page)
@@ -86,12 +85,3 @@ def find_page_num(filename, text, starting_page=0):
                 break
 
     return ans
-
-# %time find_page_num(init, 'Chapter 8') # 2.6s
-# %time find_page_num('/home/aok1425/Downloads/test_big.pdf', 'Chapter7:')
-
-def get_pages():
-    pass
-
-# I can get the ch, and parse that whole thing
-# I can search text for the s w circle, and get 5+ pgs from there
