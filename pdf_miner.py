@@ -3,6 +3,7 @@ from pdfminer.pdfinterp import PDFResourceManager, PDFPageInterpreter
 from pdfminer.converter import PDFPageAggregator, TextConverter
 from pdfminer.layout import LAParams, LTTextBox, LTTextLine, LTFigure
 from io import StringIO
+import PyPDF2
 
 class TextSnippet(object):
     def __init__(self, name, page, start_y, end_y, text):
@@ -66,32 +67,28 @@ def make_snippets(document, page_num):
 ##
 
 def find_question_page_num(document, chapter, question):
-    chapter_page = find_page_num(document, 'Chapter {}'.format(chapter))
+    chapter_page = find_page_num(document, 'Chapter{}:'.format(chapter))
     return find_page_num(document, '{}.'.format(question), starting_page=chapter_page)
 
-def find_page_num(document, text, starting_page=0, chapter=None, question=None):
-    sio = StringIO()
+def find_page_num(filename, text, starting_page=0):
     ans = None
 
-    rsrcmgr = PDFResourceManager()
-    laparams = LAParams()
-    device = TextConverter(rsrcmgr, sio, laparams=laparams)
-    interpreter = PDFPageInterpreter(rsrcmgr, device)
+    pdf_file = open(filename, 'rb')
+    read_pdf = PyPDF2.PdfFileReader(pdf_file)
+    number_of_pages = read_pdf.getNumPages()
 
-    for page_num, page_content in enumerate(document.get_pages(), 1): # TODO: make faster by only looking at the Q #s or sth similar
-        # print('on pg {}'.format(page_num))
-        if page_num >= starting_page:
-            interpreter.process_page(page_content)
-            if text.lower() in sio.getvalue().lower():
-                ans = page_num
+    for page_i in range(1, number_of_pages + 1):
+        if page_i >= starting_page:
+            page = read_pdf.getPage(page_i - 1)
+            page_content = page.extractText()
+            if text.lower() in page_content.lower():
+                ans = page_i
                 break
-
-    device.close()
-    sio.close()
 
     return ans
 
-%time find_page_num(init, 'Chapter 8') # 2.6s
+# %time find_page_num(init, 'Chapter 8') # 2.6s
+# %time find_page_num('/home/aok1425/Downloads/test_big.pdf', 'Chapter7:')
 
 def get_pages():
     pass

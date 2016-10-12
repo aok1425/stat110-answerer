@@ -62,12 +62,12 @@ def add_page_break_indices(sq):
     return sq
 
 FILENAME = '/home/aok1425/Downloads/test_big.pdf'
-CHAPTER = 8
-QUESTION_NUM = 24
+CHAPTER = 2
+QUESTION_NUM = 30
 # FILENAME = '/home/aok1425/Downloads/test_big.pdf'
 
 init = open_document(FILENAME)
-starting_page = find_question_page_num(init, chapter=CHAPTER, question=QUESTION_NUM) # 11.4s
+starting_page = find_question_page_num(FILENAME, chapter=CHAPTER, question=QUESTION_NUM) # 11.4s
 s = make_snippets(init, page_num=starting_page) # 2.2s
 
 q = make_question_snippets(s, QUESTION_NUM)
