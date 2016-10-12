@@ -2,28 +2,11 @@ from wand.image import Image
 from wand.display import display
 from pdfrw import PdfReader, PdfWriter
 
-PADDING = 10
-
-resolution = 300
-resolution = 100
-
-def take_snapshot(input_file, output_file, start_y, end_y):
-    # start_y and end_y don't involve img.height
-    with Image(filename=input_file) as img:
-        # img.resize(int(img.width * 100 / resolution), int(img.height * 100 / resolution))
-        # top = 120*3 at min
-        # img.crop(left=175, right=img.width - 175, top=img.height - 710 - PADDING, bottom=img.height - 605)
-        print(img.width, img.height)
-        img.crop(top=img.height - end_y, bottom=img.height - start_y)
-        # img.compression_quality = 2
-        img.format = 'png'
-        img.save(filename=output_file)
-        # img.make_blob()
-
-def take_snapshot(input_file, page_num, output_file, start_y, end_y):
-    with Image(filename=input_file) as img_seq:
+def take_snapshot(input_file, page_num, output_file, start_y, end_y, quality=5):
+    with Image(filename=input_file, resolution=(72 * quality, 72 * quality)) as img_seq:
         img = Image(img_seq.sequence[page_num])
-        img.crop(top=img.height - end_y, bottom=img.height - start_y)
+        img.resize(612, 792)
+        img.crop(top=img.height - end_y, bottom=img.height - start_y, left=105, right=img.width - 105)
         img.format = 'png'
         img.save(filename=output_file)
 
@@ -50,3 +33,10 @@ def make_shortened_pdf(snippets, input_file, temp_filename):
         if i in [i.page for i in snippets]:
             y.addpage(p)
     y.write(path + temp_filename)
+
+# take_snapshot('/home/aok1425/Downloads/test2.pdf',
+#               0,
+#               '/home/aok1425/Downloads/test_snap.png',
+#               0,
+#               400,
+#               quality=5)

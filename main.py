@@ -1,6 +1,10 @@
 from pdf_miner import make_snippets, TextSnippet, open_document, find_question_page_num
-from screenshotter import take_snapshots
+from image_magick import take_snapshots
 import re
+import logging
+
+# logger.propagate = False
+logging.getLogger().setLevel(logging.ERROR)
 
 def make_question_snippets(snippets, question_num):
     """Given question_num, get the snippets (and their positions) for the pertaining snippets."""
@@ -61,6 +65,18 @@ def add_page_break_indices(sq):
 
     return sq
 
+def remove_duplicate_positions(a):
+    history = set()
+    new_a = []
+
+    for i in a:
+        s = (i.page, i.start)
+        if s not in history:
+            history.add(s)
+            new_a.append(i)
+
+    return new_a
+
 class AnswerScreenshotter(object):
     def __init__(self, filename, chapter, question_num):
         self.filename = filename
@@ -77,10 +93,31 @@ class AnswerScreenshotter(object):
         a = add_page_break_indices(sq)
         take_snapshots(a, self.filename)
 
-if __name__ == '__main__':
-    FILENAME = '/home/aok1425/Downloads/test_big.pdf'
-    CHAPTER = 2
-    QUESTION_NUM = 35
+# broken: 2.26, 2.32,
 
-    ans = AnswerScreenshotter(FILENAME, CHAPTER, QUESTION_NUM)
-    ans.run()
+FILENAME = '/home/aok1425/Downloads/test_big.pdf'
+CHAPTER = 1
+QUESTION_NUM = 16
+
+init = open_document(FILENAME)
+starting_page = find_question_page_num(FILENAME, chapter=CHAPTER, question=QUESTION_NUM)  # 11.4s
+s = make_snippets(init, page_num=starting_page)  # 2.2s
+# print('page {}'.format(starting_page))
+
+q = make_question_snippets(s, QUESTION_NUM)
+sq = make_sub_snippets(q)
+a = add_page_break_indices(sq)
+aa = remove_duplicate_positions(a)
+take_snapshots(aa, FILENAME)
+#
+# print(*[i.text for i in s if i.page in (15, 16)])
+# print(*[i.text for i in s])
+
+
+# if __name__ == '__main__':
+#     FILENAME = '/home/aok1425/Downloads/test_big.pdf'
+#     CHAPTER = 2
+#     QUESTION_NUM = 26
+#
+#     ans = AnswerScreenshotter(FILENAME, CHAPTER, QUESTION_NUM)
+#     ans.run()
