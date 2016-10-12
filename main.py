@@ -1,5 +1,5 @@
-from pdf_miner import make_snippets, find_page_num
-from screenshotter import take_snapshot
+from pdf_miner import make_snippets, TextSnippet, open_document, find_question_page_num
+from screenshotter import take_snapshots
 import re
 
 def make_question_snippets(snippets, question_num):
@@ -45,19 +45,43 @@ def make_sub_snippets(q_snippets):
 
     return q_snippets[:1] + sections + q_snippets[-1:]
 
-FILENAME = '/home/aok1425/Downloads/test.pdf'
+def add_page_break_indices(sq):
+    sq = sq.copy()
+    page_break_indices = []
+    correction_factor = 0 # bc .insert() changes the indices
+
+    for i,_ in enumerate(sq):
+        if i > 0 and sq[i].page > sq[i-1].page:
+            page_break_indices.append(i)
+
+    for j in page_break_indices:
+        sq.insert(j + correction_factor, TextSnippet(None, sq[j + correction_factor].page - 1, 0, None, None))
+        sq.insert(j + 1 + correction_factor, TextSnippet(None, sq[j + 1 + correction_factor].page, 792, None, None)) # TODO: don't hardcode this
+        correction_factor += 2
+
+    return sq
+
+FILENAME = '/home/aok1425/Downloads/test_big.pdf'
+CHAPTER = 1
+QUESTION_NUM = 9
 # FILENAME = '/home/aok1425/Downloads/test_big.pdf'
 
-s = make_snippets(FILENAME, page_num=None)
-# q = make_question_snippets(s, 31)
-# sq = make_sub_snippets(q)
+init = open_document(FILENAME)
+starting_page = find_question_page_num(init, chapter=CHAPTER, question=QUESTION_NUM) # 11.4s
+s = make_snippets(init, page_num=starting_page) # 2.2s
+q = make_question_snippets(s, QUESTION_NUM)
+sq = make_sub_snippets(q)
+a = add_page_break_indices(sq)
+take_snapshots(a, FILENAME) # 32.2s
+
+# print(*[i.text for i in q])
+print(*[i.text for i in s[:20]])
+# print(*[i.text for i in sq])
+print(*[i.text for i in a])
+
+###
 
 # take_snapshot(FILENAME, q_snippets[-1].start, q_snippets[0].start)
-# take_snapshot(FILENAME, 513, 566)
+# take_snapshot(FILENAME, '/home/aok1425/Downloads/tempa.png', 576, 704)
 # take_snapshot(FILENAME, sq[1].start, sq[0].start)
 # take_snapshot(FILENAME, q[-1].start, q[0].start)
-
-
-# get_sub_snippets(q)
-# print(*[i.text for i in q])
-# print(*[i.text for i in s])
