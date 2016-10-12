@@ -26,7 +26,11 @@ def parse_layout(layout, page_i, text_snippets):
             print(lt_obj.__class__.__name__)
             print(lt_obj.get_text())
 
-            text_snippet = TextSnippet(lt_obj.__class__.__name__, page_i, int(lt_obj.bbox[3]) + 1, int(lt_obj.bbox[1]), lt_obj.get_text())
+            text_snippet = TextSnippet(lt_obj.__class__.__name__,
+                                       page_i,
+                                       int(lt_obj.bbox[3]) + 1,
+                                       int(lt_obj.bbox[1]),
+                                       lt_obj.get_text())
             text_snippets.append(text_snippet) # TODO: don't append to list outside of fn
         elif isinstance(lt_obj, LTFigure):
             parse_layout(lt_obj, page_i, text_snippets)  # Recursive
@@ -51,8 +55,8 @@ def make_snippets(document, page_num):
     device = PDFPageAggregator(rsrcmgr, laparams=laparams)
     interpreter = PDFPageInterpreter(rsrcmgr, device)
 
-    for page_i, page in enumerate(document.get_pages()):
-        if page_num - 1<= page_i < page_num + 5:
+    for page_i, page in enumerate(document.get_pages(), 1):
+        if page_num <= page_i < page_num + 5:
             interpreter.process_page(page)
             layout = device.get_result()
             parse_layout(layout, page_i, text_snippets)
@@ -86,6 +90,8 @@ def find_page_num(document, text, starting_page=0, chapter=None, question=None):
     sio.close()
 
     return ans
+
+%time find_page_num(init, 'Chapter 8') # 2.6s
 
 def get_pages():
     pass

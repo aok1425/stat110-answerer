@@ -41,4 +41,32 @@ def take_snapshots(snippets, input_file, path='/home/aok1425/Downloads/'):
             take_snapshot(input_file, snippets[i].page, path + 'temp{}.png'.format(counter), snippets[i+1].start, snippets[i].start)
             counter += 1
 
-# take_snapshot('/home/aok1425/Downloads/test2.pdf', 0, '/home/aok1425/Downloads/temp0.png', 792, 792)
+# take_snapshot('/home/aok1425/Downloads/test_big.pdf', 0, '/home/aok1425/Downloads/temp0.png', 137, 353)
+
+from pdfrw import PdfReader, PdfWriter
+
+def take_snapshots(snippets, input_file, temp_filename='tempfile.pdf'):
+    correction_factor = sorted([i.page for i in snippets])[0]
+    path = input_file[:len(input_file) - input_file[::-1].index('/')]
+
+    make_shortened_pdf(snippets, input_file, temp_filename)
+
+    counter = 1
+
+    for i,_ in enumerate(snippets[:-1]):
+        if snippets[i+1].page == snippets[i].page:
+            print('on snippet {}, temp{}'.format(i, counter))
+            take_snapshot(path + temp_filename, snippets[i].page - correction_factor, path + 'temp{}.png'.format(counter), snippets[i+1].start, snippets[i].start)
+            counter += 1
+
+def make_shortened_pdf(snippets, input_file, temp_filename):
+    infile = PdfReader(input_file)
+    path = input_file[:len(input_file) - input_file[::-1].index('/')]
+
+    y = PdfWriter()
+    for i, p in enumerate(infile.pages, 1):
+        if i in [i.page for i in snippets]:
+            y.addpage(p)
+    y.write(path + temp_filename)
+
+make_shortened_pdf(s, '/home/aok1425/Downloads/test_big.pdf', 'temp.pdf')
