@@ -2,7 +2,6 @@ from pdfminer.pdfparser import PDFParser, PDFDocument, PDFPage
 from pdfminer.pdfinterp import PDFResourceManager, PDFPageInterpreter
 from pdfminer.converter import PDFPageAggregator, TextConverter
 from pdfminer.layout import LAParams, LTTextBox, LTTextLine, LTFigure
-from io import StringIO
 import PyPDF2
 
 class TextSnippet(object):

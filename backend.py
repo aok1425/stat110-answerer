@@ -83,7 +83,7 @@ class AnswerScreenshotter(object):
         self.chapter = chapter
         self.question_num = question_num
 
-    def run(self):
+    def make_snapshots(self):
         init = open_document(self.filename)
         starting_page = find_question_page_num(self.filename, chapter=self.chapter, question=self.question_num)  # 11.4s
         s = make_snippets(init, page_num=starting_page)  # 2.2s
@@ -91,24 +91,24 @@ class AnswerScreenshotter(object):
         q = make_question_snippets(s, self.question_num)
         sq = make_sub_snippets(q)
         a = add_page_break_indices(sq)
-        take_snapshots(a, self.filename)
+        return take_snapshots(a, self.filename)
 
 # broken: 2.26, 2.32,
 
-FILENAME = '/home/aok1425/Downloads/test_big.pdf'
-CHAPTER = 1
-QUESTION_NUM = 16
-
-init = open_document(FILENAME)
-starting_page = find_question_page_num(FILENAME, chapter=CHAPTER, question=QUESTION_NUM)  # 11.4s
-s = make_snippets(init, page_num=starting_page)  # 2.2s
-# print('page {}'.format(starting_page))
-
-q = make_question_snippets(s, QUESTION_NUM)
-sq = make_sub_snippets(q)
-a = add_page_break_indices(sq)
-aa = remove_duplicate_positions(a)
-take_snapshots(aa, FILENAME)
+# FILENAME = '/home/aok1425/Downloads/test_big.pdf'
+# CHAPTER = 1
+# QUESTION_NUM = 46
+#
+# init = open_document(FILENAME)
+# starting_page = find_question_page_num(FILENAME, chapter=CHAPTER, question=QUESTION_NUM)  # 11.4s
+# s = make_snippets(init, page_num=starting_page)  # 2.2s
+# # print('page {}'.format(starting_page))
+#
+# q = make_question_snippets(s, QUESTION_NUM)
+# sq = make_sub_snippets(q)
+# a = add_page_break_indices(sq)
+# aa = remove_duplicate_positions(a)
+# take_snapshots(aa, FILENAME)
 #
 # print(*[i.text for i in s if i.page in (15, 16)])
 # print(*[i.text for i in s])

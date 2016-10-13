@@ -1,0 +1,6 @@
+flask
+pdfminer3k
+PyPDF2
+pdfrw
+wand
+gunicorn
